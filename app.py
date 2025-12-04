@@ -35,7 +35,7 @@ def make_prediction(inputs, strategy):
     for i in range(5, 0, -1):
             countdown_placeholder.markdown(f"⌛ Next prediction in *{i}* seconds...")
             time.sleep(1)
-        countdown_placeholder.empty()
+            countdown_placeholder.empty()
 
 with col2:
     st.markdown("### 🔥 History (Last 5)")
