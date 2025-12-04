@@ -1,95 +1,76 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+from collections import Counter
 
 st.set_page_config(page_title="Big vs Small Predictor", layout="centered")
-
 st.title("🎲 Big vs Small Predictor")
-st.markdown("Enter last *5 results* (digits 0 to 9):")
 
-# Session state
-if 'history' not in st.session_state:
+# --- Session State for History ---
+if "history" not in st.session_state:
     st.session_state.history = []
 
-# Input fields
+# --- Input Section ---
+st.subheader("Enter last 5 results (digits 0 to 9):")
+cols = st.columns(5)
 inputs = []
-for i in range(1, 6):
-    num = st.number_input(f"Result {i}", min_value=0, max_value=9, step=1, key=f"res{i}")
+for i in range(5):
+    num = cols[i].number_input(f"Result {i+1}", min_value=0, max_value=9, step=1, key=f"num_{i}")
     inputs.append(num)
 
-# Mode selection
-st.markdown("### 🎯 Prediction Strategy")
-mode = st.radio("Select Mode:", ["Cautious", "Balanced", "Aggressive"])
+# --- Strategy Selection ---
+st.subheader("🎯 Prediction Strategy")
+mode = st.radio("Select Mode:", ["Cautious", "Balanced", "Aggressive"], horizontal=True)
 
-def predict_big_small(data, mode):
-    avg = np.mean(data)
-    
-    # Adjust prediction thresholds based on mode
+# --- Prediction Logic ---
+def predict_big_small(numbers, mode="Balanced"):
+    count = Counter(["Big" if n >= 5 else "Small" for n in numbers])
+    bigs = count["Big"]
+    smalls = count["Small"]
+
     if mode == "Cautious":
-        threshold = 4.5
-    elif mode == "Balanced":
-        threshold = 4.0
-    else:  # Aggressive
-        threshold = 3.5
+        prediction = "Small" if smalls >= 3 else "Big"
+        elif mode == "Aggressive":
+        prediction = "Big" if bigs >= 2 else "Small"
+    else:  # Balanced
+        prediction = "Big" if bigs > smalls else "Small"
 
-    if avg >= threshold:
-        prediction = "Big"
-        confidence = min(100, (avg / 9) * 100)
-    else:
-        prediction = "Small"
-        confidence = min(100, ((9 - avg) / 9) * 100)
+    confidence = round(100 * max(bigs, smalls) / len(numbers), 1)
+    return prediction, confidence
 
-    return prediction, round(confidence, 1)
-
-# Prediction trigger
+# --- Show Prediction ---
 if st.button("🔮 Predict"):
     prediction, confidence = predict_big_small(inputs, mode)
-    
-    # Save to session history
+    st.success(f"✅ Predicted: *{prediction}*")
+    st.info(f"📊 Confidence: *{confidence}%*")
+
+    # Save to history
     st.session_state.history.append({
-        "Inputs": inputs.copy(),
-        "Prediction": prediction,
-        "Confidence": confidence,
-        "Mode": mode
+        "inputs": inputs.copy(),
+        "prediction": prediction,
+        "confidence": confidence
     })
 
-    # Display results
-    st.success(f"✅ *Predicted:* {prediction}")
-    st.info(f"📊 *Confidence:* {confidence}%")
-
-
-# Show Prediction History
-st.markdown("📜 *Prediction History*")
+# --- History Display ---
 if st.session_state.history:
-    history_df = pd.DataFrame(st.session_state.history)
-    st.dataframe(history_df, use_container_width=True)
+    st.subheader("📜 Prediction History")
+    hist_df = pd.DataFrame(st.session_state.history)
+    st.dataframe(hist_df[::-1], use_container_width=True)
 
-    # Export button
-    history_txt = history_df.to_string(index=False)
-    st.download_button("📥 Download History (TXT)", history_txt, file_name="prediction_history.txt")
-else:
-    st.info("No predictions yet.")
-    
-# Heatmap-style frequency chart
-st.markdown("🧊 *Big vs Small Frequency Chart*")
+    # --- Export Buttons ---
+    csv = hist_df.to_csv(index=False).encode("utf-8")
+    st.download_button("⬇️ Download CSV", csv, "prediction_history.csv", "text/csv")
 
-if st.session_state.history:
+    # --- Frequency Chart ---
+    st.subheader("🧊 Big vs Small Frequency Chart")
     all_results = []
     for h in st.session_state.history:
-        all_results.extend(h['inputs'])
+        all_results.extend(h["inputs"])
 
-    freq = {'Small (0-4)': 0, 'Big (5-9)': 0}
-    for n in all_results:
-        if n <= 4:
-            freq['Small (0-4)'] += 1
-        else:
-            freq['Big (5-9)'] += 1
-
-    fig, ax = plt.subplots()
-    ax.bar(freq.keys(), freq.values(), color=['blue', 'orange'])
+    labels = ["Small" if n < 5 else "Big" for n in all_results]
+    freq = Counter(labels)
+fig, ax = plt.subplots()
+    ax.bar(freq.keys(), freq.values(), color=["skyblue", "lightgreen"])
     ax.set_ylabel("Count")
     ax.set_title("Big vs Small Frequency")
     st.pyplot(fig)
-else:
-    st.info("No data to show heatmap.")
