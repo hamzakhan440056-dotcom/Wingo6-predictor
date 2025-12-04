@@ -69,7 +69,7 @@ if st.session_state.history:
 
     labels = ["Small" if n < 5 else "Big" for n in all_results]
     freq = Counter(labels)
-fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     ax.bar(freq.keys(), freq.values(), color=["skyblue", "lightgreen"])
     ax.set_ylabel("Count")
     ax.set_title("Big vs Small Frequency")
