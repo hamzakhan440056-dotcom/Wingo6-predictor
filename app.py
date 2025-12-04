@@ -63,7 +63,7 @@ if 'history' in st.session_state and st.session_state['history']:
     all_preds = np.array(preds).round().astype(int)
     counts = pd.Series(all_preds).value_counts().sort_index()
     heatmap_data = pd.DataFrame({'Count': counts})
-    return round(pred, 2), confidence
+        return round(pred, 2), confidence
 
 # --- Main App ---
 
