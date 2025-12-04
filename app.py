@@ -8,7 +8,7 @@ st.set_page_config(page_title="Big vs Small Predictor", layout="centered")
 st.title("🎲 Big vs Small Predictor")
 st.markdown("Enter last *5 results* (digits 0 to 9):")
 
-Session state
+# Session state
 if 'history' not in st.session_state:
     st.session_state.history = []
 
