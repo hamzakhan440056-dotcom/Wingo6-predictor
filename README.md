@@ -1,0 +1,1 @@
+# Wingo6-predictor
