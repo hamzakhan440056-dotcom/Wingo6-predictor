@@ -30,7 +30,7 @@ def predict_big_small(numbers, mode="Balanced"):
 
     if mode == "Cautious":
         prediction = "Small" if smalls >= 3 else "Big"
-        elif mode == "Aggressive":
+            elif mode == "Aggressive":
         prediction = "Big" if bigs >= 2 else "Small"
     else:  # Balanced
         prediction = "Big" if bigs > smalls else "Small"
