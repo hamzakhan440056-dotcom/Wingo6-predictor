@@ -57,7 +57,6 @@ if st.button("🔮 Predict"):
     # Display results
     st.success(f"✅ *Predicted:* {prediction}")
     st.info(f"📊 *Confidence:* {confidence}%")
-   *Part 3: Prediction History + Export Feature*
 
 
 # Show Prediction History
