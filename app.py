@@ -36,7 +36,7 @@ with st.form("input_form"):
         pred = avg + np.random.uniform(-0.5, 1.0)
 
     pred = max(0, min(9, round(pred)))  # Keep within 0–9
-    return pred
+        return pred
 
 # --- Show result ---
 if submitted:
