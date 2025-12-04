@@ -42,7 +42,6 @@ if st.button("🔮 Predict"):
 
     # Optional: Show input summary
     st.write("You entered:", numbers)
-  Here’s *Part 3* – Add *risk meter, countdown timer, and prediction hiscountdow
 
 # import time
 import matplotlib.pyplot as plt
