@@ -27,7 +27,7 @@ with st.form("input_form"):
 
 # --- Prediction logic ---
     def predict_next(numbers, mode):
-    avg = np.mean(numbers)
+       avg = np.mean(numbers)
     if mode == "Aggressive":
         pred = avg + np.random.uniform(0.5, 1.5)
     elif mode == "Cautious":
