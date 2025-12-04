@@ -20,7 +20,7 @@ with col5:
 
 if st.button("🔮 Predict"):
     st.write("Prediction logic will go here.")
-  Here’s *Part 2* – Basic prediction logic and result display with feedback:
+  # Here’s *Part 2* – Basic prediction logic and result display with feedback:
 
 # import numpy as np
 
