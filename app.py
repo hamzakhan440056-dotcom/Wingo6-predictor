@@ -80,7 +80,6 @@ for i in range(5, 0, -1):
     countdown.markdown(f"*{i}* seconds...")
     time.sleep(1)
 countdown.empty()
-Here’s *Part 4* – Add *Export, Heatmap, and Responsive Layout*:
 
 # import seaborn as sns
 import matplotlib.pyplot as plt
