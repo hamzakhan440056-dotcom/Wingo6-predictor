@@ -1,112 +1,68 @@
 import streamlit as st
+import numpy as np
+import time
 
 st.set_page_config(page_title="Big vs Small Predictor", layout="centered")
 
 st.title("🎲 Big vs Small Predictor")
-st.markdown("Enter last 5 results (each from 0 to 9):")
+st.markdown("Enter last 5 results (digits 0 to 9):")
 
-# User Inputs
-col1, col2, col3, col4, col5 = st.columns(5)
-with col1:
-    n1 = st.number_input("1", min_value=0, max_value=9, step=1)
-with col2:
-    n2 = st.number_input("2", min_value=0, max_value=9, step=1)
-with col3:
-    n3 = st.number_input("3", min_value=0, max_value=9, step=1)
-with col4:
-    n4 = st.number_input("4", min_value=0, max_value=9, step=1)
-with col5:
-    n5 = st.number_input("5", min_value=0, max_value=9, step=1)
-
-if st.button("🔮 Predict"):
-    st.write("Prediction logic will go here.")
-  # Here’s *Part 2* – Basic prediction logic and result display with feedback:
-
-# import numpy as np
-
-def predict_big_small(numbers):
-    avg = np.mean(numbers)
-    if avg >= 5:
-        return "BIG", "🟢", "Prediction: Likely HIGH numbers ahead!"
-    else:
-        return "SMALL", "🔴", "Prediction: Likely LOW numbers ahead!"
-
-# Collect user input into a list
-numbers = [n1, n2, n3, n4, n5]
-
-if st.button("🔮 Predict"):
-    result, color, message = predict_big_small(numbers)
-    
-    st.markdown(f"### {color} *{result}*")
-    st.markdown(f"_{message}_")
-
-    # Optional: Show input summary
-    st.write("You entered:", numbers)
-
-# import time
-import matplotlib.pyplot as plt
-
-# --- Risk Meter ---
-def get_confidence(numbers):
-    std_dev = np.std(numbers)
-    confidence = max(0, 100 - std_dev * 10)  # Arbitrary confidence logic
-    if confidence > 80:
-        color = "green"
-    elif confidence > 50:
-        color = "orange"
-    else:
-        color = "red"
-    return int(confidence), color
-
+# --- Session state for history ---
 if 'history' not in st.session_state:
-    st.session_state['history'] = []
+    st.session_state.history = []
 
-if st.button("📊 Show Risk & History"):
-    confidence, bar_color = get_confidence(numbers)
-    st.markdown(f"*Confidence:* `{confidence}%`")
-    st.progress(confidence)
+# --- Input form ---
+with st.form("input_form"):
+    col1, col2 = st.columns(2)
+    with col1:
+        n1 = st.number_input("Result 1", min_value=0, max_value=9, step=1)
+        n2 = st.number_input("Result 2", min_value=0, max_value=9, step=1)
+        n3 = st.number_input("Result 3", min_value=0, max_value=9, step=1)
+    with col2:
+        n4 = st.number_input("Result 4", min_value=0, max_value=9, step=1)
+        n5 = st.number_input("Result 5", min_value=0, max_value=9, step=1)
 
-    # Save to history
-    st.session_state['history'].append(np.mean(numbers))
+    strategy = st.selectbox("🎯 Prediction Strategy", ["Balanced", "Aggressive", "Cautious"])
+    submitted = st.form_submit_button("🔮 Predict")
 
-    # Line chart of prediction history
-    if len(st.session_state['history']) > 1:
-        st.line_chart(st.session_state['history'])
+# --- Prediction logic ---
+    def predict_next(numbers, mode):
+    avg = np.mean(numbers)
+    if mode == "Aggressive":
+        pred = avg + np.random.uniform(0.5, 1.5)
+    elif mode == "Cautious":
+        pred = avg + np.random.uniform(-1.0, 0.5)
+    else:
+        pred = avg + np.random.uniform(-0.5, 1.0)
 
-# --- Countdown ---
-st.markdown("### ⏳ Next prediction in:")
-countdown = st.empty()
-for i in range(5, 0, -1):
-    countdown.markdown(f"*{i}* seconds...")
-    time.sleep(1)
-countdown.empty()
+    pred = max(0, min(9, round(pred)))  # Keep within 0–9
+    return pred
 
-# import seaborn as sns
-import matplotlib.pyplot as plt
-# from io import BytesIO
+# --- Show result ---
+if submitted:
+    inputs = [n1, n2, n3, n4, n5]
+    prediction = predict_next(inputs, strategy)
+    st.session_state.history.append(prediction)
 
-# --- Export Buttons ---
-if st.session_state.get('history'):
-    df = pd.DataFrame(st.session_state['history'], columns=["Prediction"])
-    
-    csv = df.to_csv(index=False).encode()
-    st.download_button("⬇️ Export CSV", csv, "predictions.csv", "text/csv")
+    st.markdown(f"### 🎯 Predicted Number: `{prediction}`")
 
-    txt = "\n".join(map(str, st.session_state['history']))
-    st.download_button("📝 Export TXT", txt, "predictions.txt", "text/plain")
+    if prediction >= 5:
+        st.success("🟢 Prediction: *Big (5–9)* 😎")
+    else:
+        st.warning("🟠 Prediction: *Small (0–4)* 🤔")
 
-# --- Heatmap Chart ---
-if len(st.session_state['history']) >= 5:
-    st.markdown("### 🔥 Prediction Heatmap")
-    fig, ax = plt.subplots(figsize=(8, 1))
-    sns.heatmap([st.session_state['history']], cmap="YlOrRd", cbar=False, ax=ax)
-    st.pyplot(fig)
+    # Countdown
+    with st.empty():
+        for i in range(5, 0, -1):
+            st.info(f"⌛ Next prediction in {i} seconds...")
+            time.sleep(1)
 
-# --- Responsive Layout ---
-col1, col2, col3 = st.columns([1, 1, 1])
-with col1:
-    st.metric("Last", f"{st.session_state['history'][-1]:.2f}")
-with col2:
-    st.metric("Avg", f"{np.mean(st.session_state['history']):.2f}")
-with col3:
-    st.metric("Max", f"{np.max(st.session_state['history']):.2f}")
+# --- History section ---
+if st.session_state.history:
+    st.markdown("---")
+    st.subheader("📈 Prediction History")
+    st.write(st.session_state.history)
+
+    # Download button
+    hist_str = "\n".join(str(x) for x in st.session_state.history)
+    st.download_button("📥 Download History", hist_str, "history.txt")
