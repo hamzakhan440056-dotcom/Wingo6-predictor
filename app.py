@@ -19,10 +19,8 @@ for i in range(1, 6):
     inputs.append(num)
 
 # Mode selection
-    st.markdown("### 🎯 Prediction Strategy")
+st.markdown("### 🎯 Prediction Strategy")
 mode = st.radio("Select Mode:", ["Cautious", "Balanced", "Aggressive"])
-*Part 2: Prediction Logic & Display Results*  
-Yeh part prediction calculate karta hai, confidence nikalta hai, aur result show karta hai.
 
 def predict_big_small(data, mode):
     avg = np.mean(data)
