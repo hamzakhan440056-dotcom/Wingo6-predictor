@@ -7,7 +7,7 @@ from datetime import datetime
 st.set_page_config(page_title="🎲 Big vs Small Predictor", layout="centered")
 st.title("🎲 Big vs Small Predictor")
 
-Initialize session state
+# Initialize session state
 if 'history' not in st.session_state:
     st.session_state.history = []
 
