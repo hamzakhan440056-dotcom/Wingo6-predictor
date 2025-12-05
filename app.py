@@ -31,7 +31,7 @@ def predict(numbers, mode):
     elif mode == "Balanced":
         threshold = 5.0
     else:
-    threshold = 4.8
+        threshold = 4.8
     prediction = "Big" if avg >= threshold else "Small"
     confidence = round(abs(avg - threshold) * 20 + 80, 1)
     return prediction, confidence, avg
