@@ -1,22 +1,3 @@
-[12/5, 5:57 PM] ChatGPT: Yeh raha *full clean Streamlit code* with *time-based trends* + existing features:
-
----
-
-✅ Features included:
-1. Last 5 results input  
-2. Cautious, Balanced, Aggressive strategy  
-3. Big/Small prediction  
-4. Confidence level  
-5. Prediction history  
-6. Big vs Small frequency chart  
-7. Export as CSV  
-8. *⏳ Time-based trends chart*
-
----
-
-🧠 Full Working Code:
-
-```python
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -30,7 +11,7 @@ Initialize session state
 if 'history' not in st.session_state:
     st.session_state.history = []
 
---- Input section ---
+# --- Input section ---
 st.subheader("Enter last 5 results (digits 0 to 9):")
 inputs = []
 cols = st.columns(5)
@@ -42,7 +23,7 @@ for i in range(5):
 st.subheader("🎯 Prediction Strategy")
 mode = st.selectbox("Select Mode:", ["Cautious", "Balanced", "Aggressive"])
 
---- Prediction Logic ---
+# --- Prediction Logic ---
 def predict(numbers, mode):
     avg = np.mean(numbers)
     if mode == "Cautious":
@@ -50,12 +31,12 @@ def predict(numbers, mode):
     elif mode == "Balanced":
         threshold = 5.0
     else:
-[12/5, 5:57 PM] ChatGPT: threshold = 4.8
+    threshold = 4.8
     prediction = "Big" if avg >= threshold else "Small"
     confidence = round(abs(avg - threshold) * 20 + 80, 1)
     return prediction, confidence, avg
 
-Predict
+# Predict
 if st.button("🔮 Predict"):
     pred, conf, avg = predict(inputs, mode)
     st.success(f"✅ Predicted: {pred}")
@@ -69,7 +50,7 @@ if st.button("🔮 Predict"):
         "confidence": conf
     })
 
---- History Display ---
+# --- History Display ---
 if st.session_state.history:
     st.subheader("📜 Prediction History")
     df = pd.DataFrame(st.session_state.history)
